@@ -27,15 +27,20 @@ pub struct Config{
 
 impl Config{
   pub fn build( args: &[String]) -> Result<Config, &'static str> {
-      if args.len() < 3 {
-          return Err("Usage: minigrep <query> <file_path>");
+      let mut ignore_case = env::var("IGNORE_CASE").is_ok();
+      if args.len() < 3 || args.len() > 4 {
+          return Err("Usage: minigrep <query> <file_path> [--ignore-case]");
           //std::process::exit(1);
+      }
+      else if args.len() == 4{
+        // command line arg has higher precedence than env var
+          ignore_case = args[3] == "--ignore-case" || args[3] == "1";
       }
   
       Ok(Config{
           query: args[1].clone(),
           file_path: args[2].clone(),
-          ignore_case: env::var("IGNORE_CASE").is_ok(),
+          ignore_case,
       })
   }
 }
